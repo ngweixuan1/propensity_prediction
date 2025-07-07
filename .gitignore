@@ -1,3 +1,7 @@
 /training/data
 **/.env
 .env*
+**/wandb/*
+*.txt
+*.jpg
+*.joblib
