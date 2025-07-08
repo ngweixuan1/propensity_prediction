@@ -1,7 +1,9 @@
-pandas
-pydantic
-numpy
-openpyxl
-sklearn
-xgboost
-wandb
+joblib>=1.4.2
+matplotlib>=3.9.0
+numpy>=1.26.4
+pandas>=2.2.2
+pydantic>=2.7.1
+PyYAML>=6.0.1
+scikit-learn>=1.5.0
+wandb>=0.17.0
+xgboost>=2.0.3
