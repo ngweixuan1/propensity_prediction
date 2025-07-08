@@ -1,0 +1,35 @@
+model:
+  folders:
+    mf:
+      folder_path: "models/mf/"
+      model_name: "xgboost"
+    cc:
+      folder_path: "models/cc/"
+      model_name: "cc"
+    cl:
+      folder_path: "models/cl/"
+      model_name: "cl"
+  feature_cols:
+    - "ActBal_CA"
+    - "ActBal_SA"
+    - "ActBal_MF"
+    - "ActBal_OVD"
+    - "ActBal_CC"
+    - "ActBal_CL"
+    - "VolumeCred"
+    - "VolumeCred_CA"
+    - "TransactionsCred"
+    - "TransactionsCred_CA"
+    - "VolumeDeb"
+    - "VolumeDeb_CA"
+    - "VolumeDebCash_Card"
+    - "VolumeDebCashless_Card"
+    - "VolumeDeb_PaymentOrder"
+    - "TransactionsDeb"
+    - "TransactionsDeb_CA"
+    - "TransactionsDebCash_Card"
+    - "TransactionsDebCashless_Card"
+    - "TransactionsDeb_PaymentOrder"
+    - "Age"
+    - "Tenure"
+    - "Sex_M"
