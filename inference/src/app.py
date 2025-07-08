@@ -1,53 +1,53 @@
+# main.py
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from typing import List, Dict
+import pandas as pd
 import yaml
-import os
-import numpy as np
 
-# XGBoost imports
-import xgboost as xgb
+from predict.predict import ModelPredictor
+from optimization.optimize import optimization_selection
 
-# Sklearn imports for RandomForest
-import joblib
+# Load config
+with open("config/config.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+model_info = config["model"]["folders"] 
+FEATURE_COLS = config["model"]["feature_cols"]
+
+# Load all models into a dict keyed by model_name
+predictors = {}
+for key, info in model_info.items():
+    folder = info["folder_path"]
+    name = info["model_name"]
+    predictors[name] = ModelPredictor(
+        model_name=name,
+        model_folder=folder,
+        feature_cols=FEATURE_COLS
+    )
 
 app = FastAPI()
 
-# Load config on startup
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), '..', 'config', 'config.yaml')
-with open(CONFIG_PATH, 'r') as f:
-    config = yaml.safe_load(f)
-
-model_type = config.get('model_type', '').lower()
-model_path = config.get('model_path', '')
-
-if not model_type or not model_path:
-    raise RuntimeError("Config file must specify 'model_type' and 'model_path'")
-
-# Load the appropriate model
-if model_type == 'xgboost':
-    model = xgb.Booster()
-    model.load_model(model_path)
-elif model_type == 'randomforest':
-    model = joblib.load(model_path)
-else:
-    raise RuntimeError(f"Unsupported model_type '{model_type}' in config")
-
-# Input data model
-class ModelInput(BaseModel):
-    features: list[float]
+class PredictRequest(BaseModel):
+    data: List[Dict]
 
 @app.post("/predict")
-def predict(data: ModelInput):
-    features = np.array([data.features])
+def predict(request: PredictRequest):
+    try:
+        df = pd.DataFrame(request.data)
+        all_probs = {}
+        for model_name, predictor in predictors.items():
+            _, probs = predictor.predict(df)
+            all_probs[model_name] = probs.tolist()
+        return {"predicted_probabilities": all_probs}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    if model_type == 'xgboost':
-        dmatrix = xgb.DMatrix(features)
-        preds = model.predict(dmatrix)
-        prediction = preds[0].item()
-    elif model_type == 'randomforest':
-        preds = model.predict(features)
-        prediction = preds[0].item()
-    else:
-        raise HTTPException(status_code=500, detail="Model type unsupported")
-
-    return {"prediction": prediction}
+@app.post("/optimize")
+def optimize(request: PredictRequest):
+    try:
+        df = pd.DataFrame(request.data)
+        offers_df = optimization_selection(df)
+        return offers_df.to_dict(orient="records")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
