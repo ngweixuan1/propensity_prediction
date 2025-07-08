@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  training:
+    build:
+      context: ./training
+      dockerfile: Dockerfile
+
+  inference:
+    build:
+      context: ./inference
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - training 
