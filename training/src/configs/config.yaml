@@ -1,0 +1,27 @@
+file_path: "../data/DataScientist_CaseStudy_Dataset.xlsx"
+label_cols:
+  - Sale_MF
+  - Sale_CC
+  - Sale_CL
+  - Revenue_MF
+  - Revenue_CC
+  - Revenue_CL
+exclude_na_col: "Sex"
+test_size: 0.1
+val_size: 0.1
+random_state: 42
+sheet_map:
+  soc_dem: "Soc_Dem"
+  products: "Products_ActBalance"
+  inflow_outflow: "Inflow_Outflow"
+  sales_revenue: "Sales_Revenues"
+project_name: classifcation
+run_name: experiment_01
+hyperparameters:
+  random_forest:
+    max_depth: [3, 7]
+    min_samples_split: [5, 8]
+
+  xgboost:
+    max_depth: [3, 6, 10]
+    min_child_weight: [1, 3, 8]
